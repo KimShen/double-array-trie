@@ -33,11 +33,11 @@ public class SimpleTrieFilterTest {
 	public void testFilter() throws Exception {
 		TrieCounter after = new SimpleTrieFilter("*", this.trie).filter(this.content);
 		int total = 0;
-		for (int index = 0; index != -1; total++) {
-			index = after.source().indexOf("*", index + 1);
+		int index = -1;
+		while ((index = after.source().indexOf("*", index + 1)) != -1) {
+			total++;
 		}
-		TestCase.assertSame(16, total);
-		TestCase.assertSame(16, after.filtered());
+		TestCase.assertSame(after.filtered(), total);
 		TestCase.assertTrue(after.source().length() < this.content.length());
 	}
 
@@ -49,5 +49,16 @@ public class SimpleTrieFilterTest {
 		trie.add("你好");
 		TrieCounter after = new SimpleTrieFilter("*", trie).filter("亲爱的你,你好吗");
 		TestCase.assertSame(3, after.filtered());
+	}
+
+	@Test
+	public void testFilterSequenceWord() throws Exception {
+		TrieCounter after = new SimpleTrieFilter("*", this.trie).filter("你把把邓小平怎么样了？辦證上哪儿去办？卖枪网站的地址是什么？枪决女犯枪决现场足球世界杯！");
+		int total = 0;
+		int index = -1;
+		while ((index = after.source().indexOf("*", index + 1)) != -1) {
+			total++;
+		}
+		TestCase.assertSame(after.filtered(), total);
 	}
 }

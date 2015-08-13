@@ -27,26 +27,27 @@ public class SimpleTrieFilter implements TrieFilter {
 	public MergedTrieCounter filter(String source) throws Exception {
 		StringBuffer buffer = new StringBuffer(source);
 		Judgment judgment = new Judgment();
-		for (int index = 0; index < buffer.length(); index += this.step(buffer, judgment, index)) {
+		for (int index = 0; index < buffer.length(); index++) {
+			this.step(buffer, judgment, index);
 		}
 		return new MergedTrieCounter(buffer.toString(), judgment.count());
 	}
 
-	private int step(StringBuffer buffer, Judgment judgment, int index) {
+	private void step(StringBuffer buffer, Judgment judgment, int index) {
 		String current = String.valueOf(buffer.charAt(index));
 		if (this.trie.prefix(current)) {
 			for (int step = SimpleTrieFilter.ONE_STEP; step <= (buffer.length() - index); step++) {
 				String fragement = buffer.substring(index, index + step);
 				judgment.reset(this.trie, fragement);
 				if (judgment.same()) {
+					// Always step 1 after replace
 					buffer.replace(index, index + step, judgment.replace());
-					return step;
+					return;
 				} else if (!judgment.challenge()) {
-					break;
+					return;
 				}
 			}
 		}
-		return SimpleTrieFilter.ONE_STEP;
 	}
 
 	protected class MergedTrieCounter implements TrieCounter {
